@@ -459,13 +459,50 @@ if (attendanceError) {
   document.getElementById('clockinmsg').innerHTML=`<div class="notice">出勤を登録しました　${n.time}</div>`;
 }
 
-function clockOut(){
+async function clockOut(){
   const a=load(), n=now();
   const w=document.getElementById('oworker').value;
   for(let i=a.length-1;i>=0;i--){
     if(a[i].worker===w && !a[i].out){ a[i].out=n.time; break; }
   }
   save(a);
+  const { data: workerRow, error: workerError } = await supabaseClient
+  .from('workers')
+  .select('id')
+  .eq('name', w)
+  .single();
+
+if (workerError) {
+  alert('作業員が見つかりません');
+  return;
+}
+
+const { data: latestAttendance, error: attendanceFindError } = await supabaseClient
+  .from('attendance')
+  .select('id')
+  .eq('worker_id', workerRow.id)
+  .is('clock_out', null)
+  .order('created_at', { ascending: false })
+  .limit(1)
+  .single();
+
+if (attendanceFindError) {
+  alert('未退勤の出勤データが見つかりません');
+  return;
+}
+
+const { error: updateError } = await supabaseClient
+  .from('attendance')
+  .update({
+    clock_out: new Date().toISOString()
+  })
+  .eq('id', latestAttendance.id);
+
+if (updateError) {
+  alert('退勤の保存に失敗しました');
+  console.error(updateError);
+  return;
+}
   document.getElementById('clockoutmsg').innerHTML=`<div class="notice">退勤を登録しました　${n.time}</div>`;
 }
 
