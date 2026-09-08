@@ -408,7 +408,7 @@ function show(id){
 function load(){ return JSON.parse(localStorage.getItem('suehiro_att') || '[]'); }
 function save(x){ localStorage.setItem('suehiro_att', JSON.stringify(x)); }
 
-function clockIn(){
+async function clockIn(){
   const a=load(), n=now();
   a.push({
     date:n.date,
@@ -420,6 +420,42 @@ function clockIn(){
     report:''
   });
   save(a);
+  const workerName = document.getElementById('worker').value;
+const siteName = document.getElementById('site').value;
+const workFraction = Number(document.getElementById('unit').value);
+
+const { data: workerRow, error: workerError } = await supabaseClient
+  .from('workers')
+  .select('id')
+  .eq('name', workerName)
+  .single();
+
+const { data: siteRow, error: siteError } = await supabaseClient
+  .from('sites')
+  .select('id')
+  .eq('name', siteName)
+  .single();
+
+if (workerError || siteError) {
+  alert('作業員または現場が見つかりません');
+  return;
+}
+
+const { error: attendanceError } = await supabaseClient
+  .from('attendance')
+  .insert({
+    worker_id: workerRow.id,
+    site_id: siteRow.id,
+    work_date: n.date,
+    work_fraction: workFraction,
+    clock_in: new Date().toISOString()
+  });
+
+if (attendanceError) {
+  alert('Supabaseへの保存に失敗しました');
+  console.error(attendanceError);
+  return;
+}
   document.getElementById('clockinmsg').innerHTML=`<div class="notice">出勤を登録しました　${n.time}</div>`;
 }
 
