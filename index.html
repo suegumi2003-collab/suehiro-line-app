@@ -485,7 +485,7 @@ const { data: latestAttendance, error: attendanceFindError } = await supabaseCli
   .order('created_at', { ascending: false })
   .limit(1)
   .single();
-
+console.log('latestAttendance', latestAttendance, attendanceFindError);
 if (attendanceFindError) {
   alert('未退勤の出勤データが見つかりません');
   return;
@@ -497,7 +497,7 @@ const { error: updateError } = await supabaseClient
     clock_out: new Date().toISOString()
   })
   .eq('id', latestAttendance.id);
-
+console.log('updateError', updateError);
 if (updateError) {
   alert('退勤の保存に失敗しました');
   console.error(updateError);
