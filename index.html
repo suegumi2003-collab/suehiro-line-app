@@ -532,7 +532,7 @@ if (siteError) {
   return;
 }
 
-const { error: reportError } = await supabaseClient
+const { data: reportRows, error: reportError } = await supabaseClient
   .from('reports')
   .insert({
     worker_id: workerRow.id,
@@ -540,13 +540,51 @@ const { error: reportError } = await supabaseClient
     report_date: n.date,
     work_content: text,
     problem: memo
-  });
+  })
+  .select('id')
+  .single();
+  
+  
+    
 
 if (reportError) {
   alert('現場報告の保存に失敗しました');
   console.error(reportError);
   return;
+  const photoInput = document.getElementById('photo');
+const photoFile = photoInput?.files?.[0];
+
+if (photoFile) {
+  const ext = photoFile.name.split('.').pop() || 'jpg';
+  const filePath = `${reportRows.id}/${Date.now()}.${ext}`;
+
+  const { error: uploadError } = await supabaseClient.storage
+    .from('report-photos')
+    .upload(filePath, photoFile, {
+      cacheControl: '3600',
+      upsert: false
+    });
+
+  if (uploadError) {
+    alert('写真のアップロードに失敗しました');
+    console.error(uploadError);
+    return;
+  }
+
+  const { error: photoError } = await supabaseClient
+    .from('report_photos')
+    .insert({
+      report_id: reportRows.id,
+      file_path: filePath
+    });
+
+  if (photoError) {
+    alert('写真情報の保存に失敗しました');
+    console.error(photoError);
+    return;
+  }
 }
+
   for(let i=a.length-1;i>=0;i--){
     if(a[i].worker===w && a[i].date===n.date){
       a[i].site=s;
