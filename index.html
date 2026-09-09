@@ -521,15 +521,46 @@ function saveReport(){
   document.getElementById('reportmsg').innerHTML=`<div class="notice">現場報告を登録しました</div>`;
 }
 
-function render(){
-  const a=load();
+async function render(){
+  const start = new Date();
+start.setDate(1);
+start.setHours(0,0,0,0);
+
+const end = new Date(start);
+end.setMonth(end.getMonth() + 1);
+
+const { data: a, error } = await supabaseClient
+  .from('attendance')
+  .select(`
+    work_date,
+    work_fraction,
+    clock_in,
+    clock_out,
+    workers(name),
+    sites(name)
+  `)
+  .gte('work_date', start.toISOString().slice(0,10))
+  .lt('work_date', end.toISOString().slice(0,10))
+  .order('work_date', { ascending: true });
+
+if (error) {
+  alert('今月の出勤データの読み込みに失敗しました');
+  console.error(error);
+  return;
+}
   const tb=document.getElementById('tbody');
   tb.innerHTML='';
   let total=0;
   a.forEach(r=>{
-    total += Number(r.unit||0);
+    total += Number(r.work_fraction||0);
     const tr=document.createElement('tr');
-    tr.innerHTML=`<td>${r.date}</td><td>${r.worker}</td><td>${r.site}</td><td>${r.unit}</td><td>${r.in}</td><td>${r.out||'-'}</td>`;
+    tr.innerHTML=
+  `<td>${r.work_date}</td>
+   <td>${r.workers?.name || ''}</td>
+   <td>${r.sites?.name || ''}</td>
+   <td>${r.work_fraction}</td>
+   <td>${r.clock_in ? new Date(r.clock_in).toLocaleTimeString('ja-JP',{hour:'2-digit',minute:'2-digit'}) : ''}</td>
+   <td>${r.clock_out ? new Date(r.clock_out).toLocaleTimeString('ja-JP',{hour:'2-digit',minute:'2-digit'}) : ''}</td>`;
     tb.appendChild(tr);
   });
   document.getElementById('total').textContent=total.toFixed(1);
