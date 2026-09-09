@@ -551,7 +551,10 @@ if (reportError) {
   alert('現場報告の保存に失敗しました');
   console.error(reportError);
   return;
-  const photoInput = document.getElementById('photo');
+}
+
+const photoInput = document.getElementById('photo');
+
 const photoFile = photoInput?.files?.[0];
 
 if (photoFile) {
