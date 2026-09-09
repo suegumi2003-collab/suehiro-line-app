@@ -506,10 +506,47 @@ if (updateError) {
   document.getElementById('clockoutmsg').innerHTML=`<div class="notice">退勤を登録しました　${n.time}</div>`;
 }
 
-function saveReport(){
+async function saveReport(){
   const a=load(), n=now(), w=document.getElementById('rworker').value, s=document.getElementById('rsite').value;
   const text=document.getElementById('work').value;
   const memo=document.getElementById('memo').value;
+  const { data: workerRow, error: workerError } = await supabaseClient
+  .from('workers')
+  .select('id')
+  .eq('name', w)
+  .single();
+
+if (workerError) {
+  alert('作業員が見つかりません');
+  return;
+}
+
+const { data: siteRow, error: siteError } = await supabaseClient
+  .from('sites')
+  .select('id')
+  .eq('name', s)
+  .single();
+
+if (siteError) {
+  alert('現場が見つかりません');
+  return;
+}
+
+const { error: reportError } = await supabaseClient
+  .from('reports')
+  .insert({
+    worker_id: workerRow.id,
+    site_id: siteRow.id,
+    report_date: n.date,
+    work_content: text,
+    problem: memo
+  });
+
+if (reportError) {
+  alert('現場報告の保存に失敗しました');
+  console.error(reportError);
+  return;
+}
   for(let i=a.length-1;i>=0;i--){
     if(a[i].worker===w && a[i].date===n.date){
       a[i].site=s;
