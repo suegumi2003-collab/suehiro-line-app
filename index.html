@@ -667,10 +667,11 @@ const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
   const { data, error } = await supabaseClient
   .from('reports')
   .select(`
-    *,
-    workers(name),
-    sites(name)
-  `)
+  *,
+  workers(name),
+  sites(name),
+  report_photos(file_path)
+`)
   .order('created_at', { ascending: false });
 
   if(error){
