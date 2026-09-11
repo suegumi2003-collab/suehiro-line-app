@@ -680,7 +680,15 @@ const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
   return;
 }
 
-box.innerHTML = '<pre>' + JSON.stringify(data[0], null, 2) + '</pre>';
+box.innerHTML = data.map(r => `
+  <div class="card" style="margin-top:12px;">
+    <div><strong>日付：</strong>${r.report_date || ''}</div>
+    <div><strong>作業内容：</strong>${r.work_content || '未入力'}</div>
+    <div><strong>進捗：</strong>${r.progress || '未入力'}</div>
+    <div><strong>問題：</strong>${r.problem || 'なし'}</div>
+    <div><strong>明日の予定：</strong>${r.tomorrow_plan || '未入力'}</div>
+  </div>
+`).join('');
 }
 </script>
   </body>
