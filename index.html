@@ -657,7 +657,27 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 const SUPABASE_URL = 'https://qowvnnutbwxesfljtegg.supabase.co';
 const SUPABASE_KEY = 'sb_publishable_d1POyXutH4nzQzHfK82qPw_Cm2YL7q7';
-const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);  
+const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY); 
+  async function renderReports(){
+  const box = document.getElementById('reportlist');
+  box.innerHTML = '現場報告を読み込み中...';
+
+  const { data, error } = await supabaseClient
+    .from('reports')
+    .select('*')
+    .order('created_at', { ascending: false });
+
+  if(error){
+    console.error(error);
+    box.innerHTML = '現場報告の読み込みに失敗しました';
+    return;
+  }
+
+  if(!data || data.length === 0){
+    box.innerHTML = 'まだ現場報告はありません';
+    return;
+  }
+}
 </script>
   </body>
 </html>
