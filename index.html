@@ -652,6 +652,7 @@ function clearData(){
 document.addEventListener('DOMContentLoaded', () => {
   refreshSiteSelects();
   refreshWorkerSelects();
+  renderReports();
   const t = document.getElementById('today');
   if (t) t.textContent = now().date;
 });
