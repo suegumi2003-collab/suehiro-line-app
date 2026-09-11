@@ -676,9 +676,11 @@ const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
   }
 
   if(!data || data.length === 0){
-    box.innerHTML = 'まだ現場報告はありません';
-    return;
-  }
+  box.innerHTML = 'まだ現場報告はありません';
+  return;
+}
+
+box.innerHTML = '現場報告を ' + data.length + '件読み込みました';
 }
 </script>
   </body>
