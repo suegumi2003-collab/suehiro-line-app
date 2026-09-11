@@ -680,7 +680,7 @@ const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
   return;
 }
 
-box.innerHTML = '現場報告を ' + data.length + '件読み込みました';
+box.innerHTML = '<pre>' + JSON.stringify(data[0], null, 2) + '</pre>';
 }
 </script>
   </body>
