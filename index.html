@@ -654,8 +654,8 @@ const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
   .select(`
   *,
   workers(name),
-  sites(name),
-  report_photos(file_path)
+  sites(name)
+  
 `)
   .order('created_at', { ascending: false });
 
