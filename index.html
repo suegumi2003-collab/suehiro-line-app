@@ -383,6 +383,7 @@ function show(id){
   document.querySelectorAll('.screen').forEach(x=>x.classList.remove('active'));
   document.getElementById(id).classList.add('active');
   if(id==='list') render();
+  if(id==='reportlist') renderReports();
 }
 
 function load(){ return JSON.parse(localStorage.getItem('suehiro_att') || '[]'); }
