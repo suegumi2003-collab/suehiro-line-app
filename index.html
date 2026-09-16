@@ -654,8 +654,8 @@ const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
   .select(`
   *,
   workers(name),
-  sites(name)
-  
+  sites(name),
+ report_photos(file_path) 
 `)
   .order('created_at', { ascending: false });
 
@@ -669,7 +669,14 @@ const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
   box.innerHTML = 'まだ現場報告はありません';
   return;
 }
-
+const photoMap = {};
+const { data: photos } = await supabaseClient.from('report_photos').select('report_id,file_path');
+(photos || []).forEach(p => { photoMap[p.report_id] = p.file_path; });
+const signedPhotoMap = {};
+for (const p of (photos || [])) {
+const { data: signed } = await supabaseClient.storage.from('report-photos').createSignedUrl(p.file_path, 3600);
+  if (signed?.signedUrl) signedPhotoMap[p.report_id] = signed.signedUrl;
+ } 
 box.innerHTML = data.map(r => `
   <div class="card" style="margin-top:12px;">
   <div><strong>作業員：</strong>${r.workers?.name || '不明'}</div>
@@ -679,6 +686,8 @@ box.innerHTML = data.map(r => `
     <div><strong>進捗：</strong>${r.progress || '未入力'}</div>
     <div><strong>問題：</strong>${r.problem || 'なし'}</div>
     <div><strong>明日の予定：</strong>${r.tomorrow_plan || '未入力'}</div>
+ ${signedPhotoMap[r.id] ? `<img src="${signedPhotoMap[r.id]}" style="width:100%;margin-top:10px;border-radius:8px;">` : ''}
+ 
   </div>
 `).join('');
 }
