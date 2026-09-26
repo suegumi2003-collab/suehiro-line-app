@@ -1,108 +1,54 @@
 <!doctype html>
 <html lang="ja">
 <head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>末廣組 現場管理</title>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>末廣組 現場管理</title>
-<style>
-:root{
-  --green:#06C755;
-  --blue:#1677ff;
-  --orange:#ff8a00;
-  --bg:#f3f5f7;
-  --text:#1f2937;
-}
-*{box-sizing:border-box}
-body{
-  margin:0;
-  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Hiragino Kaku Gothic ProN","Yu Gothic",sans-serif;
-  background:var(--bg);
-  color:var(--text); 
-}
-.app{max-width:480px;margin:0 auto;min-height:100vh;background:white}
-header{
-  padding:16px 18px;
-  border-bottom:1px solid #e5e7eb;
-  font-weight:800;
-  text-align:center;
-  position:sticky;top:0;background:#fff;z-index:10;
-}
-.hero{
-  padding:22px 18px;
-  background:linear-gradient(135deg,#17324d,#2d526e);
-  color:#fff;
-}
-.hero h1{margin:0;font-size:24px}
-.hero p{margin:6px 0 0;opacity:.9}
-.screen{display:none;padding:18px}
-.screen.active{display:block}
-.btn{
-  width:100%;border:none;border-radius:12px;color:#fff;
-  font-size:19px;font-weight:800;padding:18px;margin:8px 0;
-  cursor:pointer;
-}
-.green{background:var(--green)}
-.blue{background:var(--blue)}
-.orange{background:var(--orange)}
-.gray{background:#6b7280}
-.card{
-  border:1px solid #e5e7eb;border-radius:14px;padding:16px;margin:12px 0;background:#fff;
-}
-label{display:block;font-weight:700;margin:14px 0 6px}
-select,input,textarea{
-  width:100%;padding:13px;border:1px solid #cfd5dc;border-radius:10px;
-  font-size:16px;background:white;
-}
-textarea{min-height:100px}
-.row{display:flex;gap:10px}
-.row>*{flex:1}
-.notice{
-  background:#eaf8f0;border-radius:10px;padding:12px;margin-top:12px;color:#17633a;font-weight:700
-}
-.navback{
-  border:none;background:none;color:#1677ff;font-size:16px;padding:0;margin-bottom:8px;cursor:pointer
-}
-table{width:100%;border-collapse:collapse;font-size:14px}
-th,td{border-bottom:1px solid #e5e7eb;padding:9px 6px;text-align:left}
-small{color:#6b7280}
-.badge{display:inline-block;background:#eef2f7;border-radius:999px;padding:5px 9px;font-size:12px}
-</style>
+  <style>
+    :root{--green:#06C755;--blue:#1677ff;--orange:#ff8a00;--bg:#f3f5f7;--text:#1f2937;--red:#dc2626}
+    *{box-sizing:border-box}
+    body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Hiragino Kaku Gothic ProN","Yu Gothic",sans-serif;background:var(--bg);color:var(--text)}
+    .app{max-width:520px;margin:0 auto;min-height:100vh;background:#fff}
+    header{padding:16px 18px;border-bottom:1px solid #e5e7eb;font-weight:800;text-align:center;position:sticky;top:0;background:#fff;z-index:10}
+    .hero{padding:22px 18px;background:linear-gradient(135deg,#17324d,#2d526e);color:#fff}
+    .hero h1{margin:0;font-size:24px}.hero p{margin:6px 0 0;opacity:.9}
+    .screen{display:none;padding:18px}.screen.active{display:block}
+    .btn{width:100%;border:none;border-radius:12px;color:#fff;font-size:18px;font-weight:800;padding:16px;margin:7px 0;cursor:pointer}
+    .green{background:var(--green)}.blue{background:var(--blue)}.orange{background:var(--orange)}.gray{background:#6b7280}.red{background:var(--red)}
+    .card{border:1px solid #e5e7eb;border-radius:14px;padding:16px;margin:12px 0;background:#fff}
+    label{display:block;font-weight:700;margin:14px 0 6px}
+    select,input,textarea{width:100%;padding:13px;border:1px solid #cfd5dc;border-radius:10px;font-size:16px;background:#fff}
+    textarea{min-height:100px}.row{display:flex;gap:10px}.row>*{flex:1;min-width:0}
+    .notice{background:#eaf8f0;border-radius:10px;padding:12px;margin-top:12px;color:#17633a;font-weight:700}
+    .error{background:#fff0f0;color:#a00}.navback{border:none;background:none;color:#1677ff;font-size:16px;padding:0;margin-bottom:8px;cursor:pointer}
+    table{width:100%;border-collapse:collapse;font-size:14px}th,td{border-bottom:1px solid #e5e7eb;padding:9px 6px;text-align:left;white-space:nowrap}
+    small{color:#6b7280}.scroll{overflow-x:auto}.tabs{display:flex;gap:8px;margin:10px 0}.tab{flex:1;border:1px solid #cfd5dc;background:#fff;border-radius:10px;padding:11px;font-weight:800}.tab.active{background:#17324d;color:#fff}
+    .summary{font-size:24px;font-weight:900;text-align:center;padding:10px}.muted{color:#6b7280;font-size:13px}.siteblock{border-top:1px solid #e5e7eb;padding:12px 0}.siteblock:first-child{border-top:none}
+    @media print{header,.navback,.no-print{display:none!important}.screen{display:none!important}#monthly{display:block!important;padding:0}.app{max-width:none}.card{break-inside:avoid}}
+  </style>
 </head>
 <body>
 <div class="app">
 <header>株式会社末廣組　現場管理</header>
 
 <section id="home" class="screen active">
-  <div class="hero">
-    <h1>今日も一日・ご安全に</h1>
-    <p id="today"></p>
-  </div>
-  <button class="btn green" onclick="show('clockin')">出勤する</button>
+  <div class="hero"><h1>今日も一日・ご安全に</h1><p id="today"></p></div>
+  <button class="btn green" onclick="show('attendance')">出勤を登録する</button>
   <button class="btn blue" onclick="show('report')">現場報告をする</button>
-  <button class="btn orange" onclick="show('clockout')">退勤する</button>
-
   <button class="btn gray" onclick="openAdmin()">社長・事務員用設定</button>
 </section>
 
-<section id="clockin" class="screen">
+<section id="attendance" class="screen">
   <button class="navback" onclick="show('home')">← 戻る</button>
   <h2>出勤登録</h2>
   <div class="card">
-    <label>作業員</label>
-    <select id="worker" class="workerSelect"></select>
-
-    <label>現場</label>
-    <select id="site" class="siteSelect"></select>
-
-    <label>人工</label>
-    <select id="unit">
-      <option value="1.0">1日</option>
-      <option value="0.5">半日</option>
-    </select>
-
-    <button class="btn green" onclick="clockIn()">出勤を登録する</button>
-    <div id="clockinmsg"></div>
+    <label>作業員</label><select id="worker" class="workerSelect"></select>
+    <label>現場</label><select id="site" class="siteSelect"></select>
+    <button class="btn green" onclick="registerAttendance(1)">1日出勤</button>
+    <button class="btn orange" onclick="registerAttendance(0.5)">半日出勤</button>
+    <small>出勤登録は作業員ごとに1日1回です。</small>
+    <div id="attmsg"></div>
   </div>
 </section>
 
@@ -110,30 +56,13 @@ small{color:#6b7280}
   <button class="navback" onclick="show('home')">← 戻る</button>
   <h2>現場報告</h2>
   <div class="card">
-    <label>作業員</label>
-    <select id="rworker" class="workerSelect"></select>
-    <label>現場</label>
-    <select id="rsite" class="siteSelect"></select>
-    <label>作業内容</label>
-    <textarea id="work" placeholder="例：残土積込、型枠組立、生コン打設、片付け"></textarea>
-    <label>写真</label>
-    <input id="photo" type="file" accept="image/*" capture="environment">
-    <label>備考</label>
-    <textarea id="memo" placeholder="例：残土4台搬出"></textarea>
+    <label>作業員</label><select id="rworker" class="workerSelect"></select>
+    <label>現場</label><select id="rsite" class="siteSelect"></select>
+    <label>作業内容</label><textarea id="work" placeholder="例：残土積込、型枠組立、生コン打設、片付け"></textarea>
+    <label>写真</label><input id="photo" type="file" accept="image/*" capture="environment">
+    <label>備考</label><textarea id="memo" placeholder="例：残土4台搬出"></textarea>
     <button class="btn blue" onclick="saveReport()">この内容で登録</button>
     <div id="reportmsg"></div>
-    <div id="reportlist"></div>
-  </div>
-</section>
-
-<section id="clockout" class="screen">
-  <button class="navback" onclick="show('home')">← 戻る</button>
-  <h2>退勤登録</h2>
-  <div class="card">
-    <label>作業員</label>
-    <select id="oworker" class="workerSelect"></select>
-    <button class="btn orange" onclick="clockOut()">退勤を登録する</button>
-    <div id="clockoutmsg"></div>
   </div>
 </section>
 
@@ -141,556 +70,175 @@ small{color:#6b7280}
   <button class="navback" onclick="show('home')">← 戻る</button>
   <h2>社長・事務員用設定</h2>
   <div class="card">
-    <label>暗証番号</label>
-    <input id="adminPin" type="password" inputmode="numeric" placeholder="暗証番号を入力">
+    <label>暗証番号</label><input id="adminPin" type="password" inputmode="numeric" placeholder="暗証番号を入力">
     <button class="btn gray" onclick="loginAdmin()">管理画面を開く</button>
-    <small>初期暗証番号：1234（試作品用）</small>
-    <div id="pinmsg"></div>
+    <small>初期暗証番号：1234</small><div id="pinmsg"></div>
   </div>
 </section>
 
 <section id="admin" class="screen">
   <button class="navback" onclick="show('home')">← ホームへ</button>
-  <h2>現場名の管理</h2>
+  <h2>社長・事務員用</h2>
+  <button class="btn blue" onclick="show('monthly')">月別出勤表を見る</button>
+  <button class="btn blue" onclick="show('reportListScreen')">現場報告を見る</button>
 
-  <div class="card">
-    <h3>現場を追加</h3>
-    <label>元請名</label>
-    <input id="primeName" placeholder="例：㈱ｶﾈｼﾞｭｳ橋本土建">
-    <label>現場名</label>
-    <input id="siteName" placeholder="例：用宗">
+  <div class="card"><h3>現場を追加</h3>
+    <label>元請名</label><input id="primeName" placeholder="例：㈱ｶﾈｼﾞｭｳ橋本土建">
+    <label>現場名</label><input id="siteName" placeholder="例：用宗">
     <button class="btn green" onclick="addSite()">現場を追加する</button>
-    <small>元請名だけ、または現場名だけでも登録できます。</small>
   </div>
+  <div class="card"><h3>登録済み現場</h3><div id="siteAdminList"></div></div>
 
-  <div class="card">
-    <h3>登録済み現場</h3>
-    <div id="siteAdminList"></div>
-  </div>
-
-
-  <div class="card">
-    <h3>作業員を追加</h3>
-    <label>氏名</label>
-    <input id="newWorkerName" placeholder="例：山田 太郎">
+  <div class="card"><h3>作業員を追加</h3>
+    <label>氏名</label><input id="newWorkerName" placeholder="例：山田 太郎">
     <label>職種（複数可）</label>
     <div style="display:flex;gap:18px;margin:10px 0">
       <label style="font-weight:500"><input id="jobOpe" type="checkbox" style="width:auto"> オペ</label>
       <label style="font-weight:500"><input id="jobDoko" type="checkbox" style="width:auto"> 土工</label>
     </div>
-    <label>資格</label>
-    <input id="newWorkerQual" placeholder="例：車両系、玉掛け、1級土木施工管理技士">
+    <label>資格</label><input id="newWorkerQual" placeholder="例：車両系、玉掛け">
     <button class="btn green" onclick="addWorker()">作業員を追加する</button>
   </div>
+  <div class="card"><h3>登録済み作業員</h3><div id="workerAdminList"></div></div>
 
-  <div class="card">
-    <h3>登録済み作業員</h3>
-    <div id="workerAdminList"></div>
-    <small>氏名・職種・資格は後から変更できます。</small>
+  <div class="card"><h3>暗証番号の変更</h3>
+    <label>新しい暗証番号</label><input id="newPin" type="password" inputmode="numeric" placeholder="4桁以上">
+    <button class="btn gray" onclick="changePin()">暗証番号を変更</button><div id="pinChangeMsg"></div>
   </div>
-
-  <div class="card">
-    <h3>暗証番号の変更</h3>
-    <label>新しい暗証番号</label>
-    <input id="newPin" type="password" inputmode="numeric" placeholder="4桁以上">
-    <button class="btn gray" onclick="changePin()">暗証番号を変更</button>
-    <div id="pinChangeMsg"></div>
-  </div>
-  <button class="btn blue" onclick="show('reportlist')">現場報告を見る</button>
 </section>
 
-</div>
-<section id="reportlist" class="screen">
+<section id="monthly" class="screen">
+  <button class="navback no-print" onclick="show('admin')">← 戻る</button>
+  <h2>月別出勤表</h2>
+  <div class="card no-print">
+    <label>月</label><input id="monthPicker" type="month" onchange="renderMonthly()">
+    <div class="tabs">
+      <button id="tabWorker" class="tab active" onclick="setMonthlyMode('worker')">従業員別</button>
+      <button id="tabSite" class="tab" onclick="setMonthlyMode('site')">現場別</button>
+      <button id="tabDetail" class="tab" onclick="setMonthlyMode('detail')">月間明細</button>
+    </div>
+    <button class="btn blue" onclick="renderMonthly()">集計を更新</button>
+    <button class="btn gray" onclick="window.print()">印刷</button>
+  </div>
+  <div id="monthlyOutput"></div>
+</section>
+
+<section id="reportListScreen" class="screen">
   <button class="navback" onclick="show('admin')">← 戻る</button>
-  <h2>現場報告一覧</h2>
-  <div id="reportList">現場報告を読み込み中...</div>
+  <h2>現場報告一覧</h2><div id="reportListOutput">現場報告を読み込み中...</div>
 </section>
+</div>
+
 <script>
+const SUPABASE_URL='https://qowvnnutbwxesfljtegg.supabase.co';
+const SUPABASE_KEY='sb_publishable_d1POyXutH4nzQzHfK82qPw_Cm2YL7q7';
+const supabaseClient=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
 
-const defaultWorkers = [
- {name:"田代 豪一",jobs:["オペ"],quals:[]},
- {name:"海野 貴文",jobs:["オペ"],quals:["施工管理技士","普通免許"]},
- {name:"望月 茂",jobs:["土工"],quals:["普通免許"]},
- {name:"野中 康志",jobs:["土工"],quals:["小型車両系"]},
- {name:"青柳 孝義",jobs:["土工"],quals:["小型車両系"]},
- {name:"下谷 健太",jobs:["土工"],quals:[]},
- {name:"小竹 隆史",jobs:["土工"],quals:[]},
- {name:"ドシ",jobs:["土工"],quals:[]},
- {name:"アルワン",jobs:["土工"],quals:[]},
- {name:"内田 末廣",jobs:["オペ"],quals:[]}
+const defaultWorkers=[
+{name:"田代 豪一",jobs:["オペ"],quals:[]},{name:"海野 貴文",jobs:["オペ"],quals:["施工管理技士","普通免許"]},
+{name:"望月 茂",jobs:["土工"],quals:["普通免許"]},{name:"野中 康志",jobs:["土工"],quals:["小型車両系"]},
+{name:"青柳 孝義",jobs:["土工"],quals:["小型車両系"]},{name:"下谷 健太",jobs:["土工"],quals:[]},
+{name:"小竹 隆史",jobs:["土工"],quals:[]},{name:"ドシ",jobs:["土工"],quals:[]},{name:"アルワン",jobs:["土工"],quals:[]},
+{name:"内田 末廣",jobs:["オペ"],quals:[]}
 ];
-function getWorkers(){
- const x=JSON.parse(localStorage.getItem('suehiro_workers')||'null');
- return Array.isArray(x)&&x.length?x:defaultWorkers.slice();
-}
-function saveWorkers(x){
- localStorage.setItem('suehiro_workers',JSON.stringify(x));
-  renderWorkerAdmin();
-}
-function refreshWorkerSelects(){
- const ws=getWorkers();
- document.querySelectorAll('.workerSelect').forEach(sel=>{
-   const cur=sel.value; sel.innerHTML='';
-   ws.forEach(w=>{const o=document.createElement('option');o.value=w.name;o.textContent=w.name;sel.appendChild(o)});
-   if(ws.some(w=>w.name===cur)) sel.value=cur;
- });
-}
-function renderWorkerAdmin(){
- const box=document.getElementById('workerAdminList'); if(!box)return;
- box.innerHTML='';
- getWorkers().forEach((w,i)=>{
-   const div=document.createElement('div');
-   div.className='card';
-   div.style.margin='8px 0';
-   div.innerHTML=`<b>${w.name}</b><br><small>職種：${(w.jobs||[]).join('・')||'未設定'}　資格：${(w.quals||[]).join('、')||'未設定'}</small>
-   <div style="display:flex;gap:6px;margin-top:8px"><button onclick="editWorker(${i})">変更</button><button onclick="deleteWorker(${i})">削除</button></div>`;
-   box.appendChild(div);
- });
-}
-function addWorker(){
- const name=document.getElementById('newWorkerName').value.trim(); if(!name)return;
- const jobs=[]; if(document.getElementById('jobOpe').checked)jobs.push('オペ'); if(document.getElementById('jobDoko').checked)jobs.push('土工');
- const quals=document.getElementById('newWorkerQual').value.split(/[、,]/).map(x=>x.trim()).filter(Boolean);
- const ws=getWorkers(); ws.push({name,jobs,quals}); saveWorkers(ws);
- document.getElementById('newWorkerName').value='';document.getElementById('newWorkerQual').value='';
- document.getElementById('jobOpe').checked=false;document.getElementById('jobDoko').checked=false;
-}
-function editWorker(i){
- const ws=getWorkers(), w=ws[i];
- const name=prompt('氏名',w.name); if(name===null||!name.trim())return;
- const jobs=prompt('職種（オペ、土工など。複数は「、」区切り）',(w.jobs||[]).join('、')); if(jobs===null)return;
- const quals=prompt('資格（複数は「、」区切り）',(w.quals||[]).join('、')); if(quals===null)return;
- ws[i]={name:name.trim(),jobs:jobs.split(/[、,]/).map(x=>x.trim()).filter(Boolean),quals:quals.split(/[、,]/).map(x=>x.trim()).filter(Boolean)};
- saveWorkers(ws);
-}
-function deleteWorker(i){
- const ws=getWorkers(); if(!confirm(`「${ws[i].name}」を削除しますか？`))return;
- ws.splice(i,1); saveWorkers(ws);
-}
-
-
-const defaultSites = [
-  "㈲後藤建設",
-  "㈱ｶﾈｼﾞｭｳ橋本土建　用宗",
-  "㈱ｶﾈｼﾞｭｳ橋本土建石部",
-  "㈱ｶﾈｼﾞｭｳ橋本土建　渋川",
-  "㈱丸紅",
-  "㈱杉山工務店・伐採",
-  "立花ガーデン",
-  "水見色",
-  "その他"
-];
-
-function getSites(){
-  const saved = JSON.parse(localStorage.getItem('suehiro_sites') || 'null');
-  return Array.isArray(saved) && saved.length ? saved : defaultSites.slice();
-}
-function saveSites(sites){
-  localStorage.setItem('suehiro_sites', JSON.stringify(sites));
-  
-refreshWorkerSelects();
-  renderSiteAdmin();
-}
-function refreshSiteSelects(){
-  const sites = getSites();
-  document.querySelectorAll('.siteSelect').forEach(sel=>{
-    const current = sel.value;
-    sel.innerHTML = '';
-    sites.forEach(s=>{
-      const o=document.createElement('option');
-      o.textContent=s; o.value=s;
-      sel.appendChild(o);
-    });
-    if(sites.includes(current)) sel.value=current;
-  });
-}
-function renderSiteAdmin(){
-  const box=document.getElementById('siteAdminList');
-  if(!box) return;
-  const sites=getSites();
-  box.innerHTML='';
-  sites.forEach((s,i)=>{
-    const row=document.createElement('div');
-    row.style.cssText='display:flex;gap:8px;align-items:center;margin:8px 0;';
-    row.innerHTML=`
-      <input value="${s.replace(/"/g,'&quot;')}" id="siteEdit_${i}" style="flex:1">
-      <button onclick="renameSite(${i})">変更</button>
-      <button onclick="deleteSite(${i})">削除</button>`;
-    box.appendChild(row);
-  });
-}
-function addSite(){
-  const prime=document.getElementById('primeName').value.trim();
-  const site=document.getElementById('siteName').value.trim();
-  let name='';
-  if(prime && site) name=prime+'　'+site;
-  else name=prime || site;
-  if(!name) return;
-  const sites=getSites();
-  if(!sites.includes(name)) sites.push(name);
-  saveSites(sites);
-  document.getElementById('primeName').value='';
-  document.getElementById('siteName').value='';
-}
-function renameSite(i){
-  const sites=getSites();
-  const val=document.getElementById(`siteEdit_${i}`).value.trim();
-  if(!val) return;
-  sites[i]=val;
-  saveSites(sites);
-}
-function deleteSite(i){
-  const sites=getSites();
-  if(!confirm(`「${sites[i]}」を削除しますか？`)) return;
-  sites.splice(i,1);
-  saveSites(sites);
-}
-function getAdminPin(){
-  return localStorage.getItem('suehiro_admin_pin') || '1234';
-}
-function openAdmin(){
-  show('adminLogin');
-  document.getElementById('adminPin').value='';
-  document.getElementById('pinmsg').innerHTML='';
-}
-function loginAdmin(){
-  const pin=document.getElementById('adminPin').value;
-  if(pin===getAdminPin()){
-    renderSiteAdmin();
-    renderWorkerAdmin();
-    show('admin');
-  }else{
-    document.getElementById('pinmsg').innerHTML='<div class="notice" style="background:#fff0f0;color:#a00">暗証番号が違います</div>';
-  }
-}
-function changePin(){
-  const p=document.getElementById('newPin').value.trim();
-  if(p.length<4){
-    document.getElementById('pinChangeMsg').innerHTML='<div class="notice" style="background:#fff0f0;color:#a00">4桁以上にしてください</div>';
-    return;
-  }
-  localStorage.setItem('suehiro_admin_pin',p);
-  document.getElementById('newPin').value='';
-  document.getElementById('pinChangeMsg').innerHTML='<div class="notice">暗証番号を変更しました</div>';
-}
-
+const defaultSites=["㈲後藤建設","㈱ｶﾈｼﾞｭｳ橋本土建　用宗","㈱ｶﾈｼﾞｭｳ橋本土建石部","㈱ｶﾈｼﾞｭｳ橋本土建　渋川","㈱丸紅","㈱杉山工務店・伐採","立花ガーデン","水見色","その他"];
 const pad=n=>String(n).padStart(2,'0');
-function now(){
-  const d=new Date();
-  return {
-    date:`${d.getFullYear()}/${pad(d.getMonth()+1)}/${pad(d.getDate())}`,
-    time:`${pad(d.getHours())}:${pad(d.getMinutes())}`
-  };
+function todayDb(){const d=new Date();return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`}
+function todayDisplay(){const d=new Date();return `${d.getFullYear()}/${pad(d.getMonth()+1)}/${pad(d.getDate())}`}
+function getWorkers(){const x=JSON.parse(localStorage.getItem('suehiro_workers')||'null');return Array.isArray(x)&&x.length?x:defaultWorkers.slice()}
+function saveWorkers(x){localStorage.setItem('suehiro_workers',JSON.stringify(x));refreshWorkerSelects();renderWorkerAdmin()}
+function getSites(){const x=JSON.parse(localStorage.getItem('suehiro_sites')||'null');return Array.isArray(x)&&x.length?x:defaultSites.slice()}
+function saveSites(x){localStorage.setItem('suehiro_sites',JSON.stringify(x));refreshSiteSelects();renderSiteAdmin()}
+function refreshWorkerSelects(){const ws=getWorkers();document.querySelectorAll('.workerSelect').forEach(sel=>{const cur=sel.value;sel.innerHTML='';ws.forEach(w=>sel.add(new Option(w.name,w.name)));if(ws.some(w=>w.name===cur))sel.value=cur})}
+function refreshSiteSelects(){const ss=getSites();document.querySelectorAll('.siteSelect').forEach(sel=>{const cur=sel.value;sel.innerHTML='';ss.forEach(s=>sel.add(new Option(s,s)));if(ss.includes(cur))sel.value=cur})}
+function show(id){document.querySelectorAll('.screen').forEach(x=>x.classList.remove('active'));document.getElementById(id).classList.add('active');if(id==='monthly')renderMonthly();if(id==='reportListScreen')renderReports()}
+function getAdminPin(){return localStorage.getItem('suehiro_admin_pin')||'1234'}
+function openAdmin(){show('adminLogin');adminPin.value='';pinmsg.innerHTML=''}
+function loginAdmin(){if(adminPin.value===getAdminPin()){renderSiteAdmin();renderWorkerAdmin();show('admin')}else pinmsg.innerHTML='<div class="notice error">暗証番号が違います</div>'}
+function changePin(){const p=newPin.value.trim();if(p.length<4){pinChangeMsg.innerHTML='<div class="notice error">4桁以上にしてください</div>';return}localStorage.setItem('suehiro_admin_pin',p);newPin.value='';pinChangeMsg.innerHTML='<div class="notice">暗証番号を変更しました</div>'}
+
+async function registerAttendance(fraction){
+  const workerName=worker.value,siteName=site.value,date=todayDb();
+  attmsg.innerHTML='<div class="notice">登録中...</div>';
+  const {data:workerRow,error:we}=await supabaseClient.from('workers').select('id').eq('name',workerName).single();
+  const {data:siteRow,error:se}=await supabaseClient.from('sites').select('id').eq('name',siteName).single();
+  if(we||se){attmsg.innerHTML='<div class="notice error">作業員または現場が見つかりません</div>';return}
+  const {data:existing,error:ce}=await supabaseClient.from('attendance').select('id,work_fraction').eq('worker_id',workerRow.id).eq('work_date',date).limit(1);
+  if(ce){attmsg.innerHTML='<div class="notice error">出勤確認に失敗しました</div>';return}
+  if(existing&&existing.length){attmsg.innerHTML=`<div class="notice error">${workerName}さんは本日すでに出勤登録済みです</div>`;return}
+  const {error}=await supabaseClient.from('attendance').insert({worker_id:workerRow.id,site_id:siteRow.id,work_date:date,work_fraction:fraction,clock_in:new Date().toISOString()});
+  if(error){console.error(error);attmsg.innerHTML='<div class="notice error">出勤の保存に失敗しました</div>';return}
+  attmsg.innerHTML=`<div class="notice">${date}　${workerName}さんの${fraction===1?'1日':'半日'}出勤を登録しました</div>`;
 }
 
+let monthlyMode='worker';
+function setMonthlyMode(mode){monthlyMode=mode;['Worker','Site','Detail'].forEach(x=>document.getElementById('tab'+x).classList.remove('active'));document.getElementById('tab'+mode[0].toUpperCase()+mode.slice(1)).classList.add('active');renderMonthly()}
+function monthRange(v){const [y,m]=v.split('-').map(Number);const start=`${y}-${pad(m)}-01`;const nm=m===12?`${y+1}-01-01`:`${y}-${pad(m+1)}-01`;return {start,end:nm,label:`${y}年${m}月`}}
+function fmtDays(n){return Number(n||0).toFixed(1).replace(/\.0$/,'')}
 
-function show(id){
-  document.querySelectorAll('.screen').forEach(x=>x.classList.remove('active'));
-  document.getElementById(id).classList.add('active');
-  if(id==='list') render();
-  if(id==='reportlist') renderReports();
-}
-
-function load(){ return JSON.parse(localStorage.getItem('suehiro_att') || '[]'); }
-function save(x){ localStorage.setItem('suehiro_att', JSON.stringify(x)); }
-
-async function clockIn(){
-  const a=load(), n=now();
-  a.push({
-    date:n.date,
-    worker:document.getElementById('worker').value,
-    site:document.getElementById('site').value,
-    unit:Number(document.getElementById('unit').value),
-    in:n.time,
-    out:'',
-    report:''
-  });
-  save(a);
-  const workerName = document.getElementById('worker').value;
-const siteName = document.getElementById('site').value;
-const workFraction = Number(document.getElementById('unit').value);
-
-const { data: workerRow, error: workerError } = await supabaseClient
-  .from('workers')
-  .select('id')
-  .eq('name', workerName)
-  .single();
-
-const { data: siteRow, error: siteError } = await supabaseClient
-  .from('sites')
-  .select('id')
-  .eq('name', siteName)
-  .single();
-
-if (workerError || siteError) {
-  alert('作業員または現場が見つかりません');
-  return;
-}
-
-const { error: attendanceError } = await supabaseClient
-  .from('attendance')
-  .insert({
-    worker_id: workerRow.id,
-    site_id: siteRow.id,
-    work_date: n.date,
-    work_fraction: workFraction,
-    clock_in: new Date().toISOString()
-  });
-
-if (attendanceError) {
-  alert('Supabaseへの保存に失敗しました');
-  console.error(attendanceError);
-  return;
-}
-  document.getElementById('clockinmsg').innerHTML=`<div class="notice">出勤を登録しました　${n.time}</div>`;
-}
-
-async function clockOut(){
-  const a=load(), n=now();
-  const w=document.getElementById('oworker').value;
-  for(let i=a.length-1;i>=0;i--){
-    if(a[i].worker===w && !a[i].out){ a[i].out=n.time; break; }
+async function renderMonthly(){
+  const out=document.getElementById('monthlyOutput');if(!monthPicker.value)return;
+  out.innerHTML='<div class="card">集計中...</div>';const rg=monthRange(monthPicker.value);
+  const {data,error}=await supabaseClient.from('attendance').select('work_date,work_fraction,workers(name),sites(name)').gte('work_date',rg.start).lt('work_date',rg.end).order('work_date',{ascending:true});
+  if(error){console.error(error);out.innerHTML='<div class="card notice error">出勤データの読み込みに失敗しました</div>';return}
+  const rows=data||[],total=rows.reduce((s,r)=>s+Number(r.work_fraction||0),0);
+  let html=`<div class="card"><h3>${rg.label}</h3><div class="summary">全員合計 ${fmtDays(total)} 人工</div></div>`;
+  if(monthlyMode==='worker'){
+    const map={};rows.forEach(r=>{const w=r.workers?.name||'不明',s=r.sites?.name||'不明',f=Number(r.work_fraction||0);map[w]??={};map[w][s]=(map[w][s]||0)+f});
+    const names=[...new Set([...getWorkers().map(w=>w.name),...Object.keys(map)])];
+    html+=names.map(w=>{const sites=map[w]||{},sum=Object.values(sites).reduce((a,b)=>a+b,0);return `<div class="card"><h3>${w}　<span class="muted">合計 ${fmtDays(sum)}人工</span></h3>${Object.keys(sites).length?Object.entries(sites).map(([s,n])=>`<div class="siteblock">${s}<b style="float:right">${fmtDays(n)}人工</b></div>`).join(''):'<div class="muted">この月の出勤なし</div>'}</div>`}).join('');
+  }else if(monthlyMode==='site'){
+    const map={};rows.forEach(r=>{const s=r.sites?.name||'不明',w=r.workers?.name||'不明',f=Number(r.work_fraction||0);map[s]??={};map[s][w]=(map[s][w]||0)+f});
+    const sites=[...new Set([...getSites(),...Object.keys(map)])];
+    html+=sites.map(s=>{const ws=map[s]||{},sum=Object.values(ws).reduce((a,b)=>a+b,0);return `<div class="card"><h3>${s}　<span class="muted">合計 ${fmtDays(sum)}人工</span></h3>${Object.keys(ws).length?Object.entries(ws).map(([w,n])=>`<div class="siteblock">${w}<b style="float:right">${fmtDays(n)}人工</b></div>`).join(''):'<div class="muted">この月の出勤なし</div>'}</div>`}).join('');
+  }else{
+    html+=`<div class="card scroll"><table><thead><tr><th>日付</th><th>従業員</th><th>現場</th><th>人工</th></tr></thead><tbody>${rows.map(r=>`<tr><td>${r.work_date}</td><td>${r.workers?.name||''}</td><td>${r.sites?.name||''}</td><td>${Number(r.work_fraction)===0.5?'半日 0.5':'1日 1.0'}</td></tr>`).join('')}</tbody></table>${rows.length?'':'<div class="muted">この月の出勤はありません</div>'}</div>`;
   }
-  save(a);
-  const { data: workerRow, error: workerError } = await supabaseClient
-  .from('workers')
-  .select('id')
-  .eq('name', w)
-  .single();
-
-if (workerError) {
-  alert('作業員が見つかりません');
-  return;
-}
-
-const { data: latestAttendance, error: attendanceFindError } = await supabaseClient
-  .from('attendance')
-  .select('id')
-  .eq('worker_id', workerRow.id)
-  .is('clock_out', null)
-  .order('created_at', { ascending: false })
-  .limit(1)
-  .single();
-console.log('latestAttendance', latestAttendance, attendanceFindError);
-if (attendanceFindError) {
-  alert('未退勤の出勤データが見つかりません');
-  return;
-}
-
-const { error: updateError } = await supabaseClient
-  .from('attendance')
-  .update({
-    clock_out: new Date().toISOString()
-  })
-  .eq('id', latestAttendance.id);
-console.log('updateError', updateError);
-if (updateError) {
-  alert('退勤の保存に失敗しました');
-  console.error(updateError);
-  return;
-}
-  document.getElementById('clockoutmsg').innerHTML=`<div class="notice">退勤を登録しました　${n.time}</div>`;
+  out.innerHTML=html;
 }
 
 async function saveReport(){
-  const a=load(), n=now(), w=document.getElementById('rworker').value, s=document.getElementById('rsite').value;
-  const text=document.getElementById('work').value;
-  const memo=document.getElementById('memo').value;
-  const { data: workerRow, error: workerError } = await supabaseClient
-  .from('workers')
-  .select('id')
-  .eq('name', w)
-  .single();
-
-if (workerError) {
-  alert('作業員が見つかりません');
-  return;
-}
-
-const { data: siteRow, error: siteError } = await supabaseClient
-  .from('sites')
-  .select('id')
-  .eq('name', s)
-  .single();
-
-if (siteError) {
-  alert('現場が見つかりません');
-  return;
-}
-
-const { data: reportRows, error: reportError } = await supabaseClient
-  .from('reports')
-  .insert({
-    worker_id: workerRow.id,
-    site_id: siteRow.id,
-    report_date: n.date,
-    work_content: text,
-    problem: memo
-  })
-  .select('id')
-  .single();
-  
-  
-    
-
-if (reportError) {
-  alert('現場報告の保存に失敗しました');
-  console.error(reportError);
-  return;
-}
-
-const photoInput = document.getElementById('photo');
-
-const photoFile = photoInput?.files?.[0];
-
-if (photoFile) {
-  const ext = photoFile.name.split('.').pop() || 'jpg';
-  const filePath = `${reportRows.id}/${Date.now()}.${ext}`;
-
-  const { error: uploadError } = await supabaseClient.storage
-    .from('report-photos')
-    .upload(filePath, photoFile, {
-      cacheControl: '3600',
-      upsert: false
-    });
-
-  if (uploadError) {
-    alert('写真のアップロードに失敗しました');
-    console.error(uploadError);
-    return;
+  const w=rworker.value,s=rsite.value,text=work.value,m=memo.value,date=todayDb();
+  reportmsg.innerHTML='<div class="notice">登録中...</div>';
+  const {data:wr,error:we}=await supabaseClient.from('workers').select('id').eq('name',w).single();
+  const {data:sr,error:se}=await supabaseClient.from('sites').select('id').eq('name',s).single();
+  if(we||se){reportmsg.innerHTML='<div class="notice error">作業員または現場が見つかりません</div>';return}
+  const {data:rep,error:re}=await supabaseClient.from('reports').insert({worker_id:wr.id,site_id:sr.id,report_date:date,work_content:text,problem:m}).select('id').single();
+  if(re){console.error(re);reportmsg.innerHTML='<div class="notice error">現場報告の保存に失敗しました</div>';return}
+  const file=photo.files?.[0];
+  if(file){
+    const ext=file.name.split('.').pop()||'jpg',path=`${rep.id}/${Date.now()}.${ext}`;
+    const {error:ue}=await supabaseClient.storage.from('report-photos').upload(path,file,{cacheControl:'3600',upsert:false});
+    if(ue){console.error(ue);reportmsg.innerHTML='<div class="notice error">報告は保存しましたが写真アップロードに失敗しました</div>';return}
+    const {error:pe}=await supabaseClient.from('report_photos').insert({report_id:rep.id,file_path:path});
+    if(pe){console.error(pe);reportmsg.innerHTML='<div class="notice error">報告と写真は保存しましたが写真情報の登録に失敗しました</div>';return}
   }
-
-  const { error: photoError } = await supabaseClient
-    .from('report_photos')
-    .insert({
-      report_id: reportRows.id,
-      file_path: filePath
-    });
-
-  if (photoError) {
-    alert('写真情報の保存に失敗しました');
-    console.error(photoError);
-    return;
-  }
+  reportmsg.innerHTML='<div class="notice">現場報告を登録しました</div>';work.value='';memo.value='';photo.value='';
 }
 
-  for(let i=a.length-1;i>=0;i--){
-    if(a[i].worker===w && a[i].date===n.date){
-      a[i].site=s;
-      a[i].report=text+(memo?` / ${memo}`:'');
-      break;
-    }
-  }
-  
-  document.getElementById('reportmsg').innerHTML=`<div class="notice">現場報告を登録しました</div>`;
+async function renderReports(){
+  const box=document.getElementById('reportListOutput');box.innerHTML='現場報告を読み込み中...';
+  const {data,error}=await supabaseClient.from('reports').select('*,workers(name),sites(name)').order('created_at',{ascending:false});
+  if(error){console.error(error);box.innerHTML='<div class="notice error">現場報告の読み込みに失敗しました</div>';return}
+  const {data:photos,error:photoListError}=await supabaseClient.from('report_photos').select('report_id,file_path');
+  const signed={};
+  if(!photoListError){for(const p of (photos||[])){const {data:u}=await supabaseClient.storage.from('report-photos').createSignedUrl(p.file_path,3600);if(u?.signedUrl)signed[p.report_id]=u.signedUrl}}
+  box.innerHTML=(data||[]).map(r=>`<div class="card"><div><b>作業員：</b>${r.workers?.name||'不明'}</div><div><b>現場：</b>${r.sites?.name||'不明'}</div><div><b>日付：</b>${r.report_date||''}</div><div><b>作業内容：</b>${r.work_content||'未入力'}</div><div><b>備考：</b>${r.problem||'なし'}</div>${signed[r.id]?`<img src="${signed[r.id]}" style="width:100%;margin-top:10px;border-radius:8px" alt="現場写真">`:''}</div>`).join('')||'まだ現場報告はありません';
 }
 
-async function render(){
-  const start = new Date();
-start.setDate(1);
-start.setHours(0,0,0,0);
+function renderWorkerAdmin(){const box=workerAdminList;if(!box)return;box.innerHTML='';getWorkers().forEach((w,i)=>{const d=document.createElement('div');d.className='card';d.style.margin='8px 0';d.innerHTML=`<b>${w.name}</b><br><small>職種：${(w.jobs||[]).join('・')||'未設定'}　資格：${(w.quals||[]).join('、')||'未設定'}</small><div style="display:flex;gap:6px;margin-top:8px"><button onclick="editWorker(${i})">変更</button><button onclick="deleteWorker(${i})">削除</button></div>`;box.appendChild(d)})}
+function addWorker(){const name=newWorkerName.value.trim();if(!name)return;const jobs=[];if(jobOpe.checked)jobs.push('オペ');if(jobDoko.checked)jobs.push('土工');const quals=newWorkerQual.value.split(/[、,]/).map(x=>x.trim()).filter(Boolean);const ws=getWorkers();ws.push({name,jobs,quals});saveWorkers(ws);newWorkerName.value='';newWorkerQual.value='';jobOpe.checked=jobDoko.checked=false}
+function editWorker(i){const ws=getWorkers(),w=ws[i],name=prompt('氏名',w.name);if(name===null||!name.trim())return;const jobs=prompt('職種（複数は「、」区切り）',(w.jobs||[]).join('、'));if(jobs===null)return;const quals=prompt('資格（複数は「、」区切り）',(w.quals||[]).join('、'));if(quals===null)return;ws[i]={name:name.trim(),jobs:jobs.split(/[、,]/).map(x=>x.trim()).filter(Boolean),quals:quals.split(/[、,]/).map(x=>x.trim()).filter(Boolean)};saveWorkers(ws)}
+function deleteWorker(i){const ws=getWorkers();if(!confirm(`「${ws[i].name}」を削除しますか？`))return;ws.splice(i,1);saveWorkers(ws)}
+function renderSiteAdmin(){const box=siteAdminList;if(!box)return;box.innerHTML='';getSites().forEach((s,i)=>{const d=document.createElement('div');d.style.cssText='display:flex;gap:8px;align-items:center;margin:8px 0';d.innerHTML=`<input value="${s.replace(/"/g,'&quot;')}" id="siteEdit_${i}" style="flex:1"><button onclick="renameSite(${i})">変更</button><button onclick="deleteSite(${i})">削除</button>`;box.appendChild(d)})}
+function addSite(){const p=primeName.value.trim(),s=siteName.value.trim(),name=p&&s?p+'　'+s:p||s;if(!name)return;const ss=getSites();if(!ss.includes(name))ss.push(name);saveSites(ss);primeName.value='';siteName.value=''}
+function renameSite(i){const ss=getSites(),v=document.getElementById(`siteEdit_${i}`).value.trim();if(!v)return;ss[i]=v;saveSites(ss)}
+function deleteSite(i){const ss=getSites();if(!confirm(`「${ss[i]}」を削除しますか？`))return;ss.splice(i,1);saveSites(ss)}
 
-const end = new Date(start);
-end.setMonth(end.getMonth() + 1);
-
-const { data: a, error } = await supabaseClient
-  .from('attendance')
-  .select(`
-    work_date,
-    work_fraction,
-    clock_in,
-    clock_out,
-    workers(name),
-    sites(name)
-  `)
-  .gte('work_date', start.toISOString().slice(0,10))
-  .lt('work_date', end.toISOString().slice(0,10))
-  .order('work_date', { ascending: true });
-
-if (error) {
-  alert('今月の出勤データの読み込みに失敗しました');
-  console.error(error);
-  return;
-}
-  const tb=document.getElementById('tbody');
-  tb.innerHTML='';
-  let total=0;
-  a.forEach(r=>{
-    total += Number(r.work_fraction||0);
-    const tr=document.createElement('tr');
-    tr.innerHTML=
-  `<td>${r.work_date}</td>
-   <td>${r.workers?.name || ''}</td>
-   <td>${r.sites?.name || ''}</td>
-   <td>${r.work_fraction}</td>
-   <td>${r.clock_in ? new Date(r.clock_in).toLocaleTimeString('ja-JP',{hour:'2-digit',minute:'2-digit'}) : ''}</td>
-   <td>${r.clock_out ? new Date(r.clock_out).toLocaleTimeString('ja-JP',{hour:'2-digit',minute:'2-digit'}) : ''}</td>`;
-    tb.appendChild(tr);
-  });
-  document.getElementById('total').textContent=total.toFixed(1);
-}
-function clearData(){
-  if(confirm('試作品データを全部削除しますか？')){
-    localStorage.removeItem('suehiro_att'); render();
-  }
-}
-
-document.addEventListener('DOMContentLoaded', () => {
-  refreshSiteSelects();
-  refreshWorkerSelects();
-  renderReports();
-  const t = document.getElementById('today');
-  if (t) t.textContent = now().date;
+document.addEventListener('DOMContentLoaded',()=>{
+  refreshWorkerSelects();refreshSiteSelects();today.textContent=todayDisplay();
+  const d=new Date();monthPicker.value=`${d.getFullYear()}-${pad(d.getMonth()+1)}`;
 });
-const SUPABASE_URL = 'https://qowvnnutbwxesfljtegg.supabase.co';
-const SUPABASE_KEY = 'sb_publishable_d1POyXutH4nzQzHfK82qPw_Cm2YL7q7';
-const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY); 
-  async function renderReports(){
-  const box = document.getElementById('reportlist');
-  box.innerHTML = '現場報告を読み込み中...';
-
-  const { data, error } = await supabaseClient
-  .from('reports')
-  .select(`
-  *,
-  workers(name),
-  sites(name)
- 
-`)
-  .order('created_at', { ascending: false });
-
-  if(error){
-    console.error(error);
-    box.innerHTML = '現場報告の読み込みに失敗しました';
-    return;
-  }
-
-  if(!data || data.length === 0){
-  box.innerHTML = 'まだ現場報告はありません';
-  return;
-}
-const photoMap = {};
-const { data: photos } = await supabaseClient.from('report_photos').select('report_id,file_path');
-(photos || []).forEach(p => { photoMap[p.report_id] = p.file_path; });
-const signedPhotoMap = {};
-for (const p of (photos || [])) {
-const { data: signed } = await supabaseClient.storage.from('report-photos').createSignedUrl(p.file_path, 3600);
-  if (signed?.signedUrl) signedPhotoMap[p.report_id] = signed.signedUrl;
- } 
-box.innerHTML = data.map(r => `
-  <div class="card" style="margin-top:12px;">
-  <div><strong>作業員：</strong>${r.workers?.name || '不明'}</div>
-<div><strong>現場：</strong>${r.sites?.name || '不明'}</div>
-    <div><strong>日付：</strong>${r.report_date || ''}</div>
-    <div><strong>作業内容：</strong>${r.work_content || '未入力'}</div>
-    <div><strong>進捗：</strong>${r.progress || '未入力'}</div>
-    <div><strong>問題：</strong>${r.problem || 'なし'}</div>
-    <div><strong>明日の予定：</strong>${r.tomorrow_plan || '未入力'}</div>
- ${signedPhotoMap[r.id] ? `<img src="${signedPhotoMap[r.id]}" style="width:100%;margin-top:10px;border-radius:8px;">` : ''}
- 
-  </div>
-`).join('');
-}
 </script>
-  </body>
+</body>
 </html>
