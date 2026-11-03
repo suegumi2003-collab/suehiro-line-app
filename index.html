@@ -165,7 +165,7 @@ async function registerAttendance(fraction){
   attmsg.innerHTML='<div class="notice">登録中...</div>';
   const {data:workerRow,error:we}=await supabaseClient.from('workers').select('id').eq('name',workerName).single();
   const {data:siteRow,error:se}=await supabaseClient.from('sites').select('id').eq('name',siteName).single();
-  if(we||se){attmsg.innerHTML='<div class="notice error">作業員または現場が見つかりません</div>';return}
+  if(we||se){attmsg.innerHTML='<div class="notice error">作業員エラー:${we?.message||'なし'} 現場エラー:${se?.message||'なし'}</div>';return}
   const {data:existing,error:ce}=await supabaseClient.from('attendance').select('id,work_fraction').eq('worker_id',workerRow.id).eq('work_date',date).limit(1);
   if(ce){attmsg.innerHTML='<div class="notice error">出勤確認に失敗しました</div>';return}
   if(existing&&existing.length){attmsg.innerHTML=`<div class="notice error">${workerName}さんは本日すでに出勤登録済みです</div>`;return}
