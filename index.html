@@ -56,6 +56,8 @@
   <button class="navback" onclick="show('home')">← 戻る</button>
   <h2>現場報告</h2>
   <div class="card">
+    <label>日報の日付</label><input id="reportDate" type="date">
+    
     <label>作業員</label><select id="rworker" class="workerSelect"></select>
     <label>現場</label><select id="rsite" class="siteSelect"></select>
     <label>作業内容</label><textarea id="work" placeholder="例：残土積込、型枠組立、生コン打設、片付け"></textarea>
@@ -198,7 +200,7 @@ async function renderMonthly(){
 }
 
 async function saveReport(){
-  const w=rworker.value,s=rsite.value,text=work.value,m=memo.value,date=todayDb();
+  const w=rworker.value,s=rsite.value,text=work.value,m=memo.value,date=document.getElementById('reportDate').value||todayDb();
   reportmsg.innerHTML='<div class="notice">登録中...</div>';
   const {data:wr,error:we}=await supabaseClient.from('workers').select('id').eq('name',w).single();
   const {data:sr,error:se}=await supabaseClient.from('sites').select('id').eq('name',s).single();
